@@ -1,2 +1,3 @@
 scipy
 scikit-learn
+plotly
