@@ -98,34 +98,34 @@ fig.update_layout(barmode='overlay')
 st.plotly_chart(fig)
 
 
+if st.button('Compare Results') == False:
+    st.stop()
 
-# select the model
-selected_model = st.radio('Select designated model: ', 
-             ["None", "Logistic Regression", "SVM", "Neural Network"])
+## SVC model
+dict_results = {}
+model_svc = SVC()
+model_svc.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
+score = model_svc.score(data_test[:,0].reshape(-1,1), data_test[:,1])
+dict_results["SVC"] = score*100
+
+## Logistic Reg model
+model_lreg = LogisticRegression()
+model_lreg.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
+model_lreg.score(data_test[:,0].reshape(-1,1), data_test[:,1])
+score = model_lreg.score(data_test[:,0].reshape(-1,1), data_test[:,1])
+dict_results["Log. Reg"] = score*100
+
+## NN Model
+model_mlp = MLPClassifier(hidden_layer_sizes=10, activation="relu", max_iter=20, alpha=.001,)
+model_mlp.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
+score = model_mlp.score(data_test[:,0].reshape(-1,1), data_test[:,1])
+dict_results["NN"] = score*100
 
 
-if selected_model == "SVM":
-    model_svc = SVC()
-    model_svc.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
-
-    score = model_svc.score(data_test[:,0].reshape(-1,1), data_test[:,1])
-    st.write(f"Score: {score*100:.4f}")
-
-elif selected_model == "Logistic Regression":
-    model_lreg = LogisticRegression()
-    model_lreg.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
-
-    model_lreg.score(data_test[:,0].reshape(-1,1), data_test[:,1])
-    score = model_lreg.score(data_test[:,0].reshape(-1,1), data_test[:,1])
-    st.write(f"Score: {score*100:.4f}")
-
-elif selected_model == "Neural Network":
-    
-    model_mlp = MLPClassifier(hidden_layer_sizes=10, activation="relu", max_iter=20, alpha=.001,)
-    model_mlp.fit(data_train[:,0].reshape(-1,1), data_train[:,1])
-
-    score = model_mlp.score(data_test[:,0].reshape(-1,1), data_test[:,1])
-    st.write(f"Score: {score*100:.4f}")
-
-else:
-    pass
+fig = go.Figure(data=go.Bar(x=list(dict_results.keys()), y=list(dict_results.values()),marker_color="green"))
+fig.update_layout(
+       title='Scores',
+       xaxis_title='Models',
+       yaxis_title='Score')
+fig.update_yaxes(range=[0, 100])
+st.plotly_chart(fig)
